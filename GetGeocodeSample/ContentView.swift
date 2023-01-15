@@ -141,7 +141,6 @@ class ContentViewModel : NSObject, ObservableObject, MKLocalSearchCompleterDeleg
         // 検索条件設定
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = self.location
-
         
         // 検索実行
         MKLocalSearch(request: request).start { (response, error) in
