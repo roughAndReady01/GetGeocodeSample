@@ -138,17 +138,21 @@ class ContentViewModel : NSObject, ObservableObject, MKLocalSearchCompleterDeleg
         completions = []
         locationDetail = ""
         
-        CLGeocoder().geocodeAddressString(self.location) { placemarks, error in
-            if let placemark = placemarks?.first {
+        // 検索条件設定
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = self.location
+
+        
+        // 検索実行
+        MKLocalSearch(request: request).start { (response, error) in
+            if let error = error {
+                print("MKLocalSearch Error:\(error)")
+                return
+            }
+            if let mapItem = response?.mapItems.first {
                 DispatchQueue.main.async {
-                    self.locationDetail += "国 : " + (placemark.country ?? "")
-                    self.locationDetail += "\n郵便番号 : " + (placemark.postalCode ?? "")
-                    self.locationDetail += "\n都道府県 : " + (placemark.administrativeArea ?? "")
-                    self.locationDetail += "\n市区町村 : " + (placemark.locality ?? "")
-                    self.locationDetail += "\n地名 : " + (placemark.thoroughfare ?? "")
-                    self.locationDetail += "\n番地 : " + (placemark.subThoroughfare ?? "")
-                    self.locationDetail += "\n経度 : " + String(placemark.location?.coordinate.longitude ?? 0)
-                    self.locationDetail += "\n緯度 : " + String(placemark.location?.coordinate.latitude ?? 0)
+                    self.locationDetail += "\n経度 : " + String(mapItem.placemark.coordinate.longitude)
+                    self.locationDetail += "\n緯度 : " + String(mapItem.placemark.coordinate.latitude)
                 }
             }
         }
